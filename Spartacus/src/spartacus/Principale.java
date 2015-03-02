@@ -7,6 +7,7 @@ import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import utils.ReadExcel;
 import utils.WatchDir;
 
 
@@ -16,6 +17,15 @@ public class Principale {
 	
 	public static void main(String[] args) {
 		
+		ReadExcel test = new ReadExcel();
+	    test.setInputFile("/home/autor/XLS/deroule parkandsuitesArena_drop3.xls");
+	    try {
+			test.read();
+		} catch (IOException e) {
+			// TODO Bloc catch généré automatiquement
+			e.printStackTrace();
+		}
+		
 		try {
 			new WatchDir(Paths.get("/home/autor/Watch"), true).processEvents();
 		} catch (IOException e) {
@@ -23,18 +33,20 @@ public class Principale {
 			e.printStackTrace();
 		}
 		
-		try {
-			//Connect now to a remote FTP service:
-			client.connect("wind.satellite-multimedia.com");
-
-			//Step now to the login procedure:
-			client.login("wind", "sat23Q@b");
-			
-		} catch (IllegalStateException | IOException
-				| FTPIllegalReplyException | FTPException e1) {
-			// TODO Bloc catch généré automatiquement
-			e1.printStackTrace();
-		}
+		
+		
+//		try {
+//			//Connect now to a remote FTP service:
+//			client.connect("wind.satellite-multimedia.com");
+//
+//			//Step now to the login procedure:
+//			client.login("wind", "sat23Q@b");
+//			
+//		} catch (IllegalStateException | IOException
+//				| FTPIllegalReplyException | FTPException e1) {
+//			// TODO Bloc catch généré automatiquement
+//			e1.printStackTrace();
+//		}
 	
 	}
 	

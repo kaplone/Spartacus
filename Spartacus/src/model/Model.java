@@ -3,33 +3,17 @@ package model;
 import java.util.ArrayList;
 
 public class Model {
-	
-	private char[] intro;
-	private char[] outro;
-	
-	private int nombre;
+
 	private String nom;
-	
 	private String date;
+	private ArrayList<ArrayList<String>> retour = new ArrayList<>();
+	private ArrayList<String> liste_concat = new ArrayList<>();
 	
-	
-	public char[] getIntro() {
-		return intro;
+	public ArrayList<String> getListe_concat() {
+		return liste_concat;
 	}
-	public void setIntro(char[] cs) {
-		this.intro = cs;
-	}
-	public char[] getOutro() {
-		return outro;
-	}
-	public void setOutro(char[] outro) {
-		this.outro = outro;
-	}
-	public int getNombre() {
-		return nombre;
-	}
-	public void setNombre(int nombre) {
-		this.nombre = nombre;
+	public void setListe_concat(ArrayList<String> liste_concat) {
+		this.liste_concat = liste_concat;
 	}
 	public String getNom() {
 		return nom;
@@ -43,5 +27,13 @@ public class Model {
 	public void setDate(String date) {
 		this.date = date;
 	}
+	public ArrayList<ArrayList<String>> getRetour() {
+		return retour;
+	}
+	public void setRetour(ArrayList<ArrayList<String>> retour) {
+		this.retour = retour;
+	}
+	
+	
 
 }

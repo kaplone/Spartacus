@@ -151,7 +151,7 @@ public class WatchDir {
     /**
      * Process all events for keys queued to the watcher
      */
-    public void processEvents() {
+    public void processEvents() {	
         for (;;) {
 
             // wait for key to be signalled
@@ -181,7 +181,7 @@ public class WatchDir {
                 Path name = ev.context();
                 Path child = dir.resolve(name);
                 
-                if(child.toFile().isDirectory() && ! child.endsWith("out")){
+                if(child.toFile().isDirectory()){
                 	
                 	compteur =0;
                 
@@ -196,12 +196,8 @@ public class WatchDir {
                 	System.out.println(child.getFileName().toString());
                 	
                 	if (child.getFileName().toString().contains("~")){
-                		model = new Model();
-                    	model.setNom(child.getFileName().toString().split("~")[0]);
-                    	model.setDate(child.getFileName().toString().split("~")[1]);
-                    	model.setIntro(child.getFileName().toString().split("~")[2].toCharArray());
-                    	model.setNombre(Integer.parseInt(child.getFileName().toString().split("~")[3]));
-                    	model.setIntro(child.getFileName().toString().split("~")[4].toCharArray());
+                		
+
                 	}
 
                 	concat = "concat:";
@@ -210,67 +206,59 @@ public class WatchDir {
                 }
                 else {
                 	
-                    if (child.toString().endsWith(".m2v") && event.kind() == ENTRY_CREATE && ! child.getParent().endsWith("out")){
+                    if (child.toString().endsWith(".csv") && event.kind() == ENTRY_CREATE){
                     	
-                    	// print out event
-                        System.out.format("%s (%s): %s\n", event.kind().name(), new Date(), child);
+                    	Model resultat = ReadCsv.readAndParseCsv(child.toString());
+                		ArrayList<ArrayList<String>> retour = resultat.getRetour();
                     	
-                    	concat_elements.add(child.toString());
+                    	concat_elements = resultat.getListe_concat();
+                    	
+                    }
+                    	
+                    else if (child.toString().endsWith(".m2v") && event.kind() == ENTRY_CREATE)
 
-                    	compteur ++;
-                    	if (compteur >= model.getNombre()){
-                    		
-                    		try {
-								Thread.sleep(1000);
-							} catch (InterruptedException e2) {
-								// TODO Bloc catch généré automatiquement
-								e2.printStackTrace();
-							}
-
-                    		concat += concat_elements.stream().map(i -> i.toString())
-                    			     .collect(Collectors.joining("|"));                  	
+                		concat += concat_elements.stream().map(i -> i.toString())
+                			     .collect(Collectors.joining("|"));                  	
 
 
-                        	Runtime rt = Runtime.getRuntime();
-                            Process pr;
-                            String [] commande = {"ffmpeg",  "-i", concat,  "-an", "-vcodec", "mpeg2video", "-b:v", "25M" ,Paths.get(chemin, "out", String.format("%s_%s.m2v", model.getNom(), model.getDate())).toString()};               
-                            
-							try {
-								pr = rt.exec(commande);
-								pr.waitFor();
-								 BufferedReader output = getOutput(pr);
-					            BufferedReader error = getError(pr);
-					            String ligne = "";
+                    	Runtime rt = Runtime.getRuntime();
+                        Process pr;
+                        String [] commande = {"ffmpeg",  "-i", concat,  "-an", "-vcodec", "mpeg2video", "-b:v", "35M" ,Paths.get(chemin, "out", String.format("%s_%s.m2v", model.getNom(), model.getDate())).toString()};               
+                        
+						try {
+							pr = rt.exec(commande);
+							pr.waitFor();
+							 BufferedReader output = getOutput(pr);
+				            BufferedReader error = getError(pr);
+				            String ligne = "";
 
-					            while ((ligne = output.readLine()) != null) {
-					                System.out.println(ligne);
-					            }
-					            
-					            while ((ligne = error.readLine()) != null) {
-					                System.out.println(ligne);
-					            }
+				            while ((ligne = output.readLine()) != null) {
+				                System.out.println(ligne);
+				            }
+				            
+				            while ((ligne = error.readLine()) != null) {
+				                System.out.println(ligne);
+				            }
 
-							} catch (IOException | InterruptedException  e) {
-								// TODO Bloc catch généré automatiquement
-								e.printStackTrace();
-							}
-
-											
-							if (envoiFTP(Paths.get(chemin, "out", String.format("%s_%s.m2v", model.getNom(), model.getDate())).toString())){
-								envoi_mail(String.format("%s_%s.m2v", model.getNom(), model.getDate()));
-								
-							}
+						} catch (IOException | InterruptedException  e) {
+							// TODO Bloc catch généré automatiquement
+							e.printStackTrace();
 						}
 
-                    }
-                    
-                }
+										
+						if (envoiFTP(Paths.get(chemin, "out", String.format("%s_%s.m2v", model.getNom(), model.getDate())).toString())){
+							envoi_mail(String.format("%s_%s.m2v", model.getNom(), model.getDate()));
+							
+						}
+					}
+
+
 
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
                 if (recursive && (kind == ENTRY_CREATE)) {
                     try {
-                        if (Files.isDirectory(child, NOFOLLOW_LINKS) && ! child.endsWith("out")) {
+                        if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
                             registerAll(child);
                         }
                     } catch (IOException x) {

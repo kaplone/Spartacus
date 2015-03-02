@@ -5,5 +5,8 @@
 	<classpathentry kind="lib" path="/home/autor/Telechargements/ftp4j-1.7.2/ftp4j-1.7.2.jar"/>
 	<classpathentry kind="lib" path="/home/autor/Telechargements/activation.jar"/>
 	<classpathentry kind="lib" path="/home/autor/Telechargements/mail.jar"/>
+	<classpathentry kind="lib" path="/home/autor/Telechargements/jexcelapi/jexcelapi/jxl.jar"/>
+	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/gdata-spreadsheet-2.1"/>
+	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/oauth2-v2r86lv1.18.0-rc"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
