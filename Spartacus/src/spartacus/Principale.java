@@ -17,15 +17,6 @@ public class Principale {
 	
 	public static void main(String[] args) {
 		
-		ReadExcel test = new ReadExcel();
-	    test.setInputFile("/home/autor/XLS/deroule parkandsuitesArena_drop3.xls");
-	    try {
-			test.read();
-		} catch (IOException e) {
-			// TODO Bloc catch généré automatiquement
-			e.printStackTrace();
-		}
-		
 		try {
 			new WatchDir(Paths.get("/home/autor/Watch"), true).processEvents();
 		} catch (IOException e) {

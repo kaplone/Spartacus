@@ -60,6 +60,8 @@ public class WatchDir {
     private final Map<WatchKey,Path> keys;
     private final boolean recursive;
     private boolean trace = false;
+    
+    private ArrayList<String> attente ;
 
 	private static BufferedReader getOutput(Process p) {
         return new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -71,7 +73,7 @@ public class WatchDir {
 	
 	private String chemin;
 	
-	private Model model;
+	private Model resultat;
 	
 	private int compteur =0;
 	
@@ -180,50 +182,37 @@ public class WatchDir {
                 WatchEvent<Path> ev = cast(event);
                 Path name = ev.context();
                 Path child = dir.resolve(name);
-                
-                if(child.toFile().isDirectory()){
                 	
-                	compteur =0;
-                
-                	chemin = child.toString();
-                	try {
-						Files.createDirectory(Paths.get(chemin, "out"));
-					} catch (IOException e1) {
-						// TODO Bloc catch généré automatiquement
-						e1.printStackTrace();
-					}
-                	System.out.println(chemin);
-                	System.out.println(child.getFileName().toString());
+                if (child.toString().endsWith(".csv") && event.kind() == ENTRY_CREATE){
                 	
-                	if (child.getFileName().toString().contains("~")){
-                		
-
-                	}
-
+                	resultat = ReadCsv.readAndParseCsv(child.toString());
+            		ArrayList<ArrayList<String>> retour = resultat.getRetour();
+            		
+            		attente = retour.get(1); 
+            		System.out.println("\nEN ATTENTE : \n" + attente.stream().collect(Collectors.joining("\n")));
+                	
+                	concat_elements = resultat.getListe_concat();
                 	concat = "concat:";
+                	concat += concat_elements.stream().map(i -> i.toString())
+           			     .collect(Collectors.joining("|"));
                 	
-               
+                	System.out.println(concat);
+                    	
                 }
-                else {
                 	
-                    if (child.toString().endsWith(".csv") && event.kind() == ENTRY_CREATE){
-                    	
-                    	Model resultat = ReadCsv.readAndParseCsv(child.toString());
-                		ArrayList<ArrayList<String>> retour = resultat.getRetour();
-                    	
-                    	concat_elements = resultat.getListe_concat();
-                    	
-                    }
-                    	
-                    else if (child.toString().endsWith(".m2v") && event.kind() == ENTRY_CREATE)
-
-                		concat += concat_elements.stream().map(i -> i.toString())
-                			     .collect(Collectors.joining("|"));                  	
-
-
+                else if (child.toString().endsWith(".m2v") && event.kind() == ENTRY_CREATE){
+                	
+                	System.out.println(child.toString());
+                	System.out.println(child.toFile().getName().toString());
+                	
+                	attente.remove(child.toFile().getName().toString().split(".m2v")[0]);
+                	System.out.println("\nEN ATTENTE : \n" + attente.stream().collect(Collectors.joining("\n")));
+                	
+                	if(attente.isEmpty()){
+ 
                     	Runtime rt = Runtime.getRuntime();
                         Process pr;
-                        String [] commande = {"ffmpeg",  "-i", concat,  "-an", "-vcodec", "mpeg2video", "-b:v", "35M" ,Paths.get(chemin, "out", String.format("%s_%s.m2v", model.getNom(), model.getDate())).toString()};               
+                        String [] commande = {"ffmpeg",  "-i", concat,  "-an", "-vcodec", "mpeg2video", "-b:v", "35M" ,Paths.get(chemin, String.format("%s_%s.m2v", resultat.getNom(), resultat.getDate())).toString()};               
                         
 						try {
 							pr = rt.exec(commande);
@@ -246,11 +235,12 @@ public class WatchDir {
 						}
 
 										
-						if (envoiFTP(Paths.get(chemin, "out", String.format("%s_%s.m2v", model.getNom(), model.getDate())).toString())){
-							envoi_mail(String.format("%s_%s.m2v", model.getNom(), model.getDate()));
+						if (envoiFTP(Paths.get(chemin, String.format("%s_%s.m2v", resultat.getNom(), resultat.getDate())).toString())){
+							envoi_mail(String.format("%s_%s.m2v", resultat.getNom(), resultat.getDate()));
 							
 						}
-					}
+				    }
+                }
 
 
 
